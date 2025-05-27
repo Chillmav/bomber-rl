@@ -9,43 +9,59 @@ import gymnasium as gym
 import os
 from gymnasium.spaces import Box, Discrete
 
-
 class BomberGame(gym.Env):
     # Setup the environment action and observation shapes
     def __init__(self):
         
         self.observation_space = Box(low=0, high=255, shape=(1,83,100), dtype=np.uint8)
-        self.action_space = Discrete(3)
+        self.action_space = Discrete(6)
         self.cap = mss()
         
         self.game_location = {'top': 50, "left": 1275, 'width': 500, 'height': 450}
         self.done_location = {'top': 270, "left": 1435, 'width': 150, 'height': 25}
+        
     # What is called to do something in the game
     def step(self, action):
         
+            
         action_map = {
             0: 'right',
             1: 'down',
             2: 'up',
-            3: 'left', 
-            4: 'f', # bomb
+            3: 'left',
+            4: 'f',
             5: 'no_op'
         }
-        
+
         if action != 5:
-            pydirectinput.press(action_map[action])
-            
+            key = action_map[action]
+            print(f"Performing action: {key}")
+            pydirectinput.keyDown(key)
+            time.sleep(0.2)
+            pydirectinput.keyUp(key)
+                    
+
+
         done, done_cap = self.get_done()
-        
         new_observation = self.get_observation()
+        if done:
+            print('Game over detected')
+            
         
-        pass
+        
+        return new_observation, done
     # Visualize the game
     def render(self):
         pass
     # Restart the game
     def reset(self):
-        pass
+        time.sleep(1)
+        pydirectinput.keyDown('ctrl')
+        pydirectinput.press('r')
+        pydirectinput.keyUp('ctrl')
+        time.sleep(1)
+        pydirectinput.press('Enter')
+        return self.get_observation()
     # Gain game window
     def get_observation(self):
         
@@ -60,10 +76,8 @@ class BomberGame(gym.Env):
     
     # Game over
     def get_done(self):
-
+        
         done_cap = np.array(self.cap.grab(self.done_location))
-
-
         gray_frame = cv2.cvtColor(done_cap, cv2.COLOR_BGRA2GRAY)
 
         template = cv2.imread('screenshots/game_over.png', 0)
@@ -77,7 +91,12 @@ class BomberGame(gym.Env):
     
     
 env = BomberGame()
-# plt.imshow(env.get_observation()[0], cmap='gray')
-plt.imshow(env.get_done()[1], cmap='gray')
-print(env.get_done()[0])
-plt.show()
+env.get_done()
+
+for episode in range(10):
+    obs = env.reset()
+    done = False
+    
+    while not done:
+        
+        obs, done = env.step(env.action_space.sample())
