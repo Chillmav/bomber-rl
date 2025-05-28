@@ -8,16 +8,16 @@ import time
 import gymnasium as gym
 import os
 from gymnasium.spaces import Box, Discrete
-
+from image_to_tile_matrix import image_to_tile_matrix
 class BomberGame(gym.Env):
     # Setup the environment action and observation shapes
     def __init__(self):
         
-        self.observation_space = Box(low=0, high=255, shape=(1,83,100), dtype=np.uint8)
+        self.observation_space = Box(low=0, high=255, shape=(1,130,110), dtype=np.uint8)
         self.action_space = Discrete(6)
         self.cap = mss()
         
-        self.game_location = {'top': 50, "left": 1275, 'width': 500, 'height': 450}
+        self.game_location = {'top': 131, "left": 1325, 'width': 416, 'height': 352}
         self.done_location = {'top': 270, "left": 1435, 'width': 150, 'height': 25}
         
     # What is called to do something in the game
@@ -67,11 +67,14 @@ class BomberGame(gym.Env):
         
         raw = np.array(self.cap.grab(self.game_location))[:,:,:3].astype(np.uint8)
         
-        gray = cv2.cvtColor(raw, cv2.COLOR_BGRA2GRAY)
+        resized = cv2.resize(raw, (130,110))
         
-        resized = cv2.resize(gray, (100,83))
+        print(image_to_tile_matrix(resized))
+        plt.imshow(resized, cmap='gray')
+        plt.show()
         
-        channel = np.reshape(resized, (1,83,100))
+        
+        channel = np.reshape(resized, (1,130,110))
         return channel
     
     # Game over
@@ -91,12 +94,15 @@ class BomberGame(gym.Env):
     
     
 env = BomberGame()
-env.get_done()
 
-for episode in range(10):
-    obs = env.reset()
-    done = False
+env.get_done()
+env.get_observation()
+
+
+# for episode in range(10):
+#     obs = env.reset()
+#     done = False
     
-    while not done:
+#     while not done:
         
-        obs, done = env.step(env.action_space.sample())
+#         obs, done = env.step(env.action_space.sample())
