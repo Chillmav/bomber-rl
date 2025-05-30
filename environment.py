@@ -2,13 +2,13 @@ from mss import mss
 import pydirectinput 
 import cv2
 import numpy as np
-import pytesseract
 from matplotlib import pyplot as plt
 import time
 import gymnasium as gym
 import os
 from gymnasium.spaces import Box, Discrete
 from image_to_tile_matrix import image_to_tile_matrix
+
 class BomberGame(gym.Env):
     # Setup the environment action and observation shapes
     def __init__(self):
@@ -17,7 +17,7 @@ class BomberGame(gym.Env):
         self.action_space = Discrete(6)
         self.cap = mss()
         
-        self.game_location = {'top': 131, "left": 1325, 'width': 416, 'height': 352}
+        self.game_location = {'top': 163, "left": 1340, 'width': 520, 'height': 440} # laptop
         self.done_location = {'top': 270, "left": 1435, 'width': 150, 'height': 25}
         
     # What is called to do something in the game
@@ -74,7 +74,7 @@ class BomberGame(gym.Env):
         plt.show()
         
         
-        channel = np.reshape(resized, (1,130,110))
+        channel = np.reshape(resized, (1,130,110,3))
         return channel
     
     # Game over

@@ -18,7 +18,7 @@ def image_to_tile_matrix(image, cols=13, rows=11, tile_width=10, tile_height=10)
             avg_r = np.mean(tile[:,:,2])
             avg_value = np.mean(tile)
             
-            if avg_value < 39:
+            if avg_r == 82.08:
                 tile_matrix[row, col] = 2 # bricks
             elif avg_value == 74:
                 tile_matrix[row, col] = 0 # path
@@ -30,7 +30,7 @@ def image_to_tile_matrix(image, cols=13, rows=11, tile_width=10, tile_height=10)
                 if tile_matrix[row, col - 1] > avg_b and tile_matrix[row, col - 1] not in [0, 1, 2, 3]:
                     tile_matrix[row, col] = 0
                 elif tile_matrix[row - 1, col] > avg_b and tile_matrix[row - 1, col] not in [0, 1, 2, 3]:
-                    tile[row, col] = 0
+                    tile_matrix[row, col] = 0
                 else:
                     tile_matrix[row, col] = 4 # mob
     tile_matrix[1::2, 1::2] = 1 
